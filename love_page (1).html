@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔐 Open Me Baby</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4, #ffecd2, #a18cd1, #fbc2eb);
+    background-size: 400% 400%;
+    animation: bgShift 8s ease infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  @keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .hearts-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .heart-float {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: floatUp linear infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0.4; }
+    100% { transform: translateY(-10vh) rotate(20deg); opacity: 0; }
+  }
+
+  .screen {
+    display: none;
+    z-index: 10;
+    position: relative;
+  }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+  /* ── PASSWORD SCREEN ── */
+  #pass-screen {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(255,105,180,0.3);
+  }
+
+  #pass-screen h1 { font-size: 2rem; color: #c0396b; margin-bottom: 0.5rem; }
+  #pass-screen p { color: #8e2255; margin-bottom: 1.5rem; font-size: 1rem; }
+
+  .lock-icon { font-size: 3rem; margin-bottom: 1rem; animation: wiggle 2s ease-in-out infinite; }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+
+  #passInput {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid #f9a8d4;
+    background: rgba(255,255,255,0.7);
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 6px;
+    color: #c0396b;
+    outline: none;
+    margin-bottom: 1rem;
+  }
+  #passInput:focus { border-color: #c0396b; }
+
+  #enterBtn {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #f9a8d4, #c0396b);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.1rem;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 16px rgba(192,57,107,0.4);
+  }
+  #enterBtn:hover { transform: scale(1.03); }
+  #enterBtn:active { transform: scale(0.97); }
+
+  #errMsg { color: #8e2255; font-size: 0.9rem; margin-top: 0.75rem; min-height: 1.2rem; }
+
+  /* ── WRONG PASSWORD SCREEN ── */
+  #wrong-screen {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(255,105,180,0.3);
+  }
+
+  .cat-art {
+    font-size: 6rem;
+    line-height: 1;
+    margin: 0.5rem 0;
+    animation: catShake 0.5s ease infinite;
+  }
+  @keyframes catShake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-4px) rotate(-2deg); }
+    75% { transform: translateX(4px) rotate(2deg); }
+  }
+
+  #wrong-screen h2 { font-size: 1.4rem; color: #c0396b; margin: 1rem 0 0.5rem; }
+  #wrong-screen p { color: #8e2255; font-size: 1rem; margin-bottom: 1.5rem; }
+
+  .knife-cat-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 1rem 0;
+  }
+
+  .try-again-btn {
+    padding: 0.6rem 1.8rem;
+    background: linear-gradient(135deg, #f9a8d4, #c0396b);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(192,57,107,0.3);
+    transition: transform 0.1s;
+  }
+  .try-again-btn:hover { transform: scale(1.05); }
+
+  /* ── LOVE YOU SCREEN ── */
+  #love-screen {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    text-align: center;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(255,105,180,0.3);
+  }
+
+  .big-heart { font-size: 5rem; animation: heartBeat 1s ease-in-out infinite; }
+  @keyframes heartBeat {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  #love-screen h1 { font-size: 2.2rem; color: #c0396b; margin: 1rem 0 0.5rem; }
+  #love-screen p { color: #8e2255; font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.5rem; }
+
+  .next-btn {
+    padding: 0.75rem 2.5rem;
+    background: linear-gradient(135deg, #f9a8d4, #c0396b);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.1rem;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(192,57,107,0.4);
+    transition: transform 0.15s;
+  }
+  .next-btn:hover { transform: scale(1.05); }
+
+  /* ── LETTER SCREEN ── */
+  #letter-screen {
+    background: rgba(255,255,255,0.9);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    max-width: 480px;
+    width: 92%;
+    box-shadow: 0 8px 32px rgba(255,105,180,0.4);
+    border: 2px solid #f9a8d4;
+    text-align: center;
+  }
+
+  .letter-header { font-size: 1.8rem; color: #c0396b; margin-bottom: 1rem; }
+  .letter-pic {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f9a8d4;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    margin: 0 auto 1.2rem;
+  }
+
+  .letter-body {
+    font-size: 1rem;
+    color: #6b3050;
+    line-height: 1.9;
+    text-align: left;
+    background: rgba(255,240,248,0.7);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    border-left: 4px solid #f9a8d4;
+    margin-bottom: 1.2rem;
+  }
+
+  .letter-sign { color: #c0396b; font-size: 1.2rem; font-style: italic; margin-top: 0.5rem; }
+  .confetti-row { font-size: 1.5rem; margin: 0.5rem 0; letter-spacing: 4px; }
+</style>
+</head>
+<body>
+
+<!-- Floating hearts background -->
+<div class="hearts-bg" id="heartsContainer"></div>
+
+<!-- SCREEN 1: Password -->
+<div class="screen active" id="pass-screen">
+  <div class="lock-icon">🔐</div>
+  <h1>Open Me 💕</h1>
+  <p>Enter the secret code to unlock something special...</p>
+  <input type="password" id="passInput" maxlength="4" placeholder="****" inputmode="numeric" />
+  <button id="enterBtn" onclick="checkPassword()">Unlock 💖</button>
+  <p id="errMsg"></p>
+</div>
+
+<!-- SCREEN 2: Wrong Password (Cat with knife) -->
+<div class="screen" id="wrong-screen">
+  <h2>WOWW YOU FORGOT MY BIRTH YEAR?! 😾🔪</h2>
+  <div class="cat-art">🐱🔪</div>
+  <p>This cat is NOT happy with you right now.<br>How could you forget 2004?! 😤</p>
+  <p style="font-size:0.85rem; color:#999; margin-bottom:0.5rem;">*glares in birthday*</p>
+  <button class="try-again-btn" onclick="goBack()">Sorry sorry!! Let me try again 🥺</button>
+</div>
+
+<!-- SCREEN 3: I Love You -->
+<div class="screen" id="love-screen">
+  <div class="big-heart">❤️</div>
+  <h1>I LOVE YOU MOTKA! 😘</h1>
+  <p>You remembered! Of course you did 🥰<br>
+  You mean everything to me, you big silly.<br>
+  Now click below for your special message 💌</p>
+  <button class="next-btn" onclick="showLetter()">Open my letter 💌</button>
+</div>
+
+<!-- SCREEN 4: Letter with pic -->
+<div class="screen" id="letter-screen">
+  <div class="letter-header">💌 A Letter For You 💌</div>
+  <div class="confetti-row">🌸🌺🌸🌺🌸</div>
+
+  <!-- Cute emoji pic (replace img tag below with a real <img src="yourphoto.jpg"> if you want) -->
+  <div class="letter-pic">🥰</div>
+
+  <div class="letter-body">
+    <p>My dearest Motka,</p><br>
+    <p>Every single day with you feels like the warmest hug I never want to let go of. 🌷</p><br>
+    <p>You make my heart do the silliest little flips — and I wouldn't trade that feeling for anything in the world.</p><br>
+    <p>Thank you for being my favourite person, my safe place, and my biggest reason to smile. 🌙</p><br>
+    <p>No matter how far or how close — I'm always, always yours. 💕</p><br>
+    <p class="letter-sign">Forever yours,<br>Your baby 🌸</p>
+  </div>
+
+  <div class="confetti-row">💖✨💖✨💖</div>
+</div>
+
+<script>
+  // --- Floating hearts ---
+  const container = document.getElementById('heartsContainer');
+  const heartEmojis = ['❤️','💕','💗','💖','💝','🌸','✨','💞','🩷'];
+  for (let i = 0; i < 18; i++) {
+    const h = document.createElement('div');
+    h.className = 'heart-float';
+    h.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.animationDuration = (6 + Math.random() * 8) + 's';
+    h.style.animationDelay = (Math.random() * 8) + 's';
+    h.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+    container.appendChild(h);
+  }
+
+  // --- Password logic ---
+  const PASSWORD = '2004';
+
+  document.getElementById('passInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkPassword();
+  });
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function checkPassword() {
+    const val = document.getElementById('passInput').value.trim();
+    if (val === PASSWORD) {
+      showScreen('love-screen');
+    } else if (val.length === 0) {
+      document.getElementById('errMsg').textContent = 'Type something!! 🙄';
+    } else {
+      showScreen('wrong-screen');
+      document.getElementById('passInput').value = '';
+    }
+  }
+
+  function goBack() {
+    document.getElementById('errMsg').textContent = '';
+    showScreen('pass-screen');
+  }
+
+  function showLetter() {
+    showScreen('letter-screen');
+  }
+</script>
+</body>
+</html>
